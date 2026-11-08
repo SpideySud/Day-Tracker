@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="My Day">
+<title>My Day</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f5f2;--card:#fff;--ink:#1f2a28;--mute:#6b7774;--line:#dde3df;--busy:#7a4cc2;--med:#e0a21b;--none:#2f9d8a;--accent:#2f9d8a;--win:#e8f5f1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a19;--card:#1f2826;--ink:#eaf0ee;--mute:#93a29e;--line:#2f3b38;--busy:#a98af0;--med:#f0bb42;--none:#4fc2ae;--accent:#4fc2ae;--win:#1b332e;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141a19;--card:#1f2826;--ink:#eaf0ee;--mute:#93a29e;--line:#2f3b38;--busy:#a98af0;--med:#f0bb42;--none:#4fc2ae;--accent:#4fc2ae;--win:#1b332e;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",system-ui,-apple-system,sans-serif;font-size:16px;line-height:1.4}
+main{max-width:520px;margin:0 auto;padding:20px 16px 96px}
+h1{font-size:28px;margin:4px 0 2px;font-weight:700}
+.date{color:var(--mute);margin:0 0 4px}
+.id-line{margin:0 0 16px;font-weight:500;color:var(--accent)}
+h2{font-size:18px;margin:0 0 12px}
+section{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--line);padding:4px;border-radius:12px;margin-bottom:16px}
+.tab{border:0;background:transparent;color:var(--ink);font:inherit;font-weight:500;border-radius:9px;min-height:44px;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--card)}
+.moods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mood{border:2px solid var(--line);background:transparent;color:var(--ink);border-radius:12px;padding:14px 4px;font:inherit;font-weight:500;cursor:pointer;min-height:48px}
+.mood[aria-pressed="true"]{color:#fff;border-color:transparent}
+.mood[data-m="super"][aria-pressed="true"]{background:var(--busy)}
+.mood[data-m="medium"][aria-pressed="true"]{background:var(--med);color:#1f2a28}
+.mood[data-m="none"][aria-pressed="true"]{background:var(--none)}
+.week{display:flex;gap:10px;margin-top:14px;align-items:flex-end;color:var(--mute);font-size:13px}
+.week .lbl{margin-right:auto;align-self:center}
+.wd{display:flex;flex-direction:column;align-items:center;gap:4px}
+.dot{width:16px;height:16px;border-radius:50%;background:var(--line)}
+.dot.super{background:var(--busy)}.dot.medium{background:var(--med)}.dot.none{background:var(--none)}
+.dot.today{outline:2px solid var(--ink);outline-offset:2px}
+.dot.future{background:transparent;border:1px dashed var(--line)}
+.add{display:flex;gap:8px;margin-bottom:8px}
+input[type=text],input[type=number]{flex:1;min-width:0;font:inherit;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.btn{font:inherit;font-weight:500;border:0;border-radius:10px;padding:0 16px;background:var(--accent);color:#fff;cursor:pointer;min-height:44px}
+:root:not([data-theme="light"]) .btn{color:#10201d}
+.link{background:none;border:0;color:var(--mute);font:inherit;cursor:pointer;min-height:44px;padding:0 8px;text-decoration:underline}
+ul{list-style:none;margin:0;padding:0}
+li{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+li:first-child{border-top:0}
+li label{flex:1;display:flex;align-items:center;gap:12px;cursor:pointer;min-height:32px}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent);flex:none}
+.done span{text-decoration:line-through;color:var(--mute)}
+.x{background:none;border:0;color:var(--mute);font-size:22px;cursor:pointer;padding:4px 8px;min-height:44px}
+.empty{color:var(--mute);margin:4px 0}
+.sub{color:var(--mute);margin:-6px 0 12px;font-size:14px}
+.goal{padding:14px 0;border-top:1px solid var(--line)}
+.goal:first-of-type{border-top:0;padding-top:0}
+.goal-top{display:flex;align-items:center;gap:8px}
+.goal-name{flex:1;font-weight:700}
+.streak{color:var(--mute);font-size:14px;margin:4px 0 10px}
+.streak b{color:var(--ink)}
+.checkin{width:100%;border:2px solid var(--accent);background:transparent;color:var(--ink);font:inherit;font-weight:500;border-radius:10px;min-height:48px;cursor:pointer}
+.chips{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px}
+.chip{border:2px solid var(--accent);background:transparent;color:var(--ink);font:inherit;font-weight:500;border-radius:10px;min-height:48px;cursor:pointer}
+.alldone{background:var(--win);border-radius:12px;padding:16px}
+.toast{position:fixed;left:16px;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));max-width:488px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:12px;padding:12px 16px;display:flex;gap:12px;align-items:center;z-index:20}
+.toast span{flex:1}
+.toast button{background:none;border:0;color:var(--bg);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;min-height:44px}
+.wnav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.wnav button{background:var(--card);border:1px solid var(--line);color:var(--ink);border-radius:10px;width:44px;height:44px;font-size:20px;cursor:pointer}
+.wnav button:disabled{opacity:.35;cursor:default}
+.wnav strong{text-align:center}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.stat{background:var(--bg);border-radius:10px;padding:10px 12px}
+.stat b{display:block;font-size:20px}
+.stat small{color:var(--mute)}
+.chart{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:90px;margin-top:12px}
+.col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;font-size:11px;color:var(--mute)}
+.col i{display:block;width:100%;max-width:28px;border-radius:5px 5px 2px 2px;background:var(--accent)}
+.col i.none{background:var(--line)}
+.next{font-size:14px;color:var(--mute);margin:8px 0 0}
+.sync{color:var(--mute);font-size:13px;text-align:center;margin-top:8px}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+  <h1>My day</h1>
+  <p class="date" id="date"></p>
+  
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="t-today" aria-selected="true">Today</button>
+    <button class="tab" role="tab" id="t-prog" aria-selected="false">Progress</button>
+  </div>
+
+  <div id="v-today">
+    <section aria-labelledby="h-mood">
+      <h2 id="h-mood">How busy is today?</h2>
+      <div class="moods" id="moods">
+        <button class="mood" data-m="super" aria-pressed="false">Super busy</button>
+        <button class="mood" data-m="medium" aria-pressed="false">Medium busy</button>
+        <button class="mood" data-m="none" aria-pressed="false">No busy</button>
+      </div>
+      <div class="week" id="week"></div>
+    </section>
+
+    <section aria-labelledby="h-todo">
+      <h2 id="h-todo">To do today</h2>
+      <div class="add">
+        <input type="text" id="todo-in" placeholder="Add a task" aria-label="New task" maxlength="120">
+        <button class="btn" id="todo-add">Add</button>
+      </div>
+      <ul id="todos"></ul>
+    </section>
+
+    <section aria-labelledby="h-goals">
+      <h2 id="h-goals">Long-term goals</h2>
+      <p class="sub" id="goal-sub"></p>
+      <div class="add">
+        <input type="text" id="goal-in" placeholder="Add a goal" aria-label="New goal" maxlength="80">
+        <button class="btn" id="goal-add">Add</button>
+      </div>
+      <div id="goals"></div>
+    </section>
+  </div>
+
+  <div id="v-prog" hidden>
+    <div class="wnav">
+      <button id="w-prev" aria-label="Previous week">‹</button>
+      <strong id="w-label"></strong>
+      <button id="w-next" aria-label="Next week">›</button>
+    </div>
+    <div id="prog"></div>
+  </div>
+<p class="sync" id="sync"></p>
+<div class="sync"><button class="link" id="bk">Back up data</button><button class="link" id="rs">Restore backup</button><input type="file" id="rf" accept=".json,application/json" hidden></div>
+</main>
+<div class="toast" id="toast" hidden role="status"><span id="toast-msg"></span><button id="toast-undo">Undo</button></div>
+
+<script>
+(function(){
+  var KEY = 'myday-v1';
+  var state = { days: {}, goals: [] };
+  try { var raw = localStorage.getItem(KEY); if (raw) state = JSON.parse(raw); } catch(e) {}
+  state.days = state.days || {}; state.goals = state.goals || [];
+
+  var remote = null, pushT = null;
+  function setSync(t){ var e=document.getElementById('sync'); if(e) e.textContent=t; }
+  function push(){
+    if(!remote) return;
+    remote.set({json: JSON.stringify(state), updated: state.updated||0}).then(function(){ setSync('Saved on this device and backed up to your account.'); }).catch(function(){ setSync('Saved on this device. Backup failed and will retry on your next change.'); });
+  }
+  function save(){
+    state.updated = Date.now();
+    try { localStorage.setItem(KEY, JSON.stringify(state)); if(!remote) setSync('Saved on this device.'); } catch(e) { setSync('Could not save on this device.'); }
+    if(remote){ clearTimeout(pushT); pushT=setTimeout(push,600); }
+  }
+  function ymd(d){ var m=d.getMonth()+1, dd=d.getDate(); return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(dd<10?'0':'')+dd; }
+  function offset(n){ var d=new Date(); d.setDate(d.getDate()-n); return ymd(d); }
+  function dt(k){ return new Date(k+'T12:00:00'); }
+  function day(k){ if(!state.days[k]) state.days[k]={mood:null,todos:[],goals:{}}; return state.days[k]; }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+  function esc(s){ return s.replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function logged(v){ return v===true || typeof v==='number'; }
+  function mins(v){ return typeof v==='number' ? v : 0; }
+  function gval(k,id){ var d=state.days[k]; return d && d.goals ? d.goals[id] : undefined; }
+  function fmt(m){ if(m<60) return m+' min'; var h=Math.floor(m/60), r=m%60; return h+' h'+(r?' '+r+' min':''); }
+  function weekStart(w){ var d=new Date(); d.setDate(d.getDate()-((d.getDay()+6)%7)+7*w); return d; }
+  function weekKeys(w){ var s=weekStart(w), out=[]; for(var j=0;j<7;j++){ var d=new Date(s); d.setDate(s.getDate()+j); out.push(ymd(d)); } return out; }
+  var LET = ['M','T','W','T','F','S','S'];
+  var MILES = [3,7,14,30,60,100];
+
+  var today = ymd(new Date());
+  var openId = null, weekOff = 0, undoFn = null, toastT = null;
+  document.getElementById('date').textContent = new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'});
+
+  function streak(id){
+    var n=0, i = logged(gval(today,id)) ? 0 : 1;
+    for(; i<800; i++){ if(logged(gval(offset(i),id))) n++; else break; }
+    return n;
+  }
+  function bestStreak(id){
+    var keys = Object.keys(state.days).filter(function(k){return logged(gval(k,id));}).sort();
+    var best=0, cur=0, prev=null;
+    keys.forEach(function(k){
+      if(prev && Math.round((dt(k)-dt(prev))/864e5)===1) cur++; else cur=1;
+      if(cur>best) best=cur; prev=k;
+    });
+    return best;
+  }
+  function nextMile(s){ for(var i=0;i<MILES.length;i++) if(MILES[i]>s) return MILES[i]; return null; }
+
+  function renderMood(){
+    var d = day(today);
+    document.querySelectorAll('.mood').forEach(function(b){ b.setAttribute('aria-pressed', d.mood===b.dataset.m); });
+    var keys = weekKeys(0), html = '<span class="lbl">This week</span>';
+    keys.forEach(function(k,j){
+      var m=(state.days[k]||{}).mood, cls='dot';
+      if(k>today) cls+=' future'; else if(m) cls+=' '+m;
+      if(k===today) cls+=' today';
+      html += '<div class="wd"><span class="'+cls+'" title="'+k+'"></span><small>'+LET[j]+'</small></div>';
+    });
+    document.getElementById('week').innerHTML = html;
+    
+    
+  }
+  function renderTodos(){
+    var d = day(today), ul = document.getElementById('todos');
+    if (!d.todos.length){ ul.innerHTML = '<p class="empty">Nothing yet. Add your first task for today.</p>'; return; }
+    ul.innerHTML = d.todos.map(function(t){
+      return '<li class="'+(t.done?'done':'')+'"><label><input type="checkbox" data-id="'+t.id+'"'+(t.done?' checked':'')+'><span>'+esc(t.t)+'</span></label><button class="x" data-del="'+t.id+'" aria-label="Delete task">×</button></li>';
+    }).join('');
+  }
+  function goalCard(g){
+    var s = streak(g.id), line;
+    if (s>0) line = '<b>'+s+'-day streak</b>. Log today to keep it going.' + (nextMile(s) ? ' Next milestone: '+nextMile(s)+' days.' : '');
+    else if (!logged(gval(offset(1),g.id)) && logged(gval(offset(2),g.id))) line = 'Missed yesterday. Log today to start a new streak.';
+    else line = 'No streak yet.';
+    var act;
+    if (openId===g.id){
+      act = '<div class="chips">'+[5,15,30,60].map(function(m){return '<button class="chip" data-min="'+m+'" data-g="'+g.id+'">'+m+' min</button>';}).join('')+'</div>'
+        + '<div class="add"><input type="number" id="min-in" inputmode="numeric" min="1" max="1440" placeholder="Other minutes" aria-label="Minutes spent"><button class="btn" data-save="'+g.id+'">Save</button><button class="link" data-cancel="1">Cancel</button></div>';
+    } else act = '<button class="checkin" data-open="'+g.id+'">I worked on this</button>';
+    return '<div class="goal"><div class="goal-top"><span class="goal-name">'+esc(g.name)+'</span></div><div class="streak">'+line+'</div>'+act+'</div>';
+  }
+  function renderGoals(){
+    var box = document.getElementById('goals'), sub = document.getElementById('goal-sub');
+    if (!state.goals.length){ sub.textContent=''; box.innerHTML = '<p class="empty">Add a goal you want to work on every day.</p>'; return; }
+    var left = state.goals.filter(function(g){return !logged(gval(today,g.id));});
+    var doneN = state.goals.length-left.length;
+    sub.textContent = left.length ? left.length+' of '+state.goals.length+' left today' : '';
+    if (!left.length){
+      var tot=0; state.goals.forEach(function(g){ tot+=mins(gval(today,g.id)); });
+      box.innerHTML = '<div class="alldone"><strong>All done for today.</strong><br>'+(tot?fmt(tot)+' invested across '+doneN+(doneN===1?' goal':' goals')+'. ':'')+'Your goals return tomorrow.</div>';
+      return;
+    }
+    box.innerHTML = left.map(goalCard).join('') + (doneN ? '<p class="empty">'+doneN+' already done today.</p>' : '');
+    if (openId){ var inp=document.getElementById('min-in'); if(inp) inp.focus(); }
+  }
+
+  function toast(msg, undo){
+    var t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=msg;
+    undoFn = undo || null; document.getElementById('toast-undo').hidden = !undo; t.hidden=false;
+    clearTimeout(toastT); toastT=setTimeout(function(){ t.hidden=true; undoFn=null; }, 7000);
+  }
+  
+  function logGoal(id, m){
+    m = Math.round(Number(m));
+    if (!m || m<1 || m>1440) return;
+    var d = day(today), g = state.goals.filter(function(x){return x.id===id;})[0]; if(!g) return;
+    d.goals[id] = m; openId = null; save(); renderGoals(); renderMood();
+    var s = streak(id), msg;
+    if (MILES.indexOf(s)>-1) msg = s+'-day streak on “'+g.name+'”.';
+    else msg = fmt(m)+' logged for “'+g.name+'”.';
+    toast(msg, function(){ delete day(today).goals[id]; save(); renderGoals(); renderMood(); renderProg(); });
+  }
+
+  function renderProg(){
+    var keys = weekKeys(weekOff), a=dt(keys[0]), b=dt(keys[6]);
+    var opt = {month:'short',day:'numeric'};
+    document.getElementById('w-label').textContent = weekOff===0 ? 'This week' : a.toLocaleDateString(undefined,opt)+' – '+b.toLocaleDateString(undefined,opt);
+    document.getElementById('w-next').disabled = weekOff===0;
+    var box = document.getElementById('prog');
+    if (!state.goals.length){ box.innerHTML = '<section><p class="empty">Add a goal on the Today tab and your progress will show up here.</p></section>'; return; }
+    box.innerHTML = state.goals.map(function(g){
+      var vals = keys.map(function(k){ var v=gval(k,g.id); return logged(v)?Math.max(mins(v),0):-1; });
+      var max = Math.max.apply(null, vals.concat([1])), wTot=0, wDays=0;
+      vals.forEach(function(v){ if(v>=0){ wTot+=v; wDays++; } });
+      var allKeys = Object.keys(state.days).filter(function(k){return logged(gval(k,g.id));});
+      var tot=0; allKeys.forEach(function(k){ tot+=mins(gval(k,g.id)); });
+      var s = streak(g.id), nm = nextMile(s);
+      var chart = '<div class="chart">'+vals.map(function(v,j){
+        var h = v<0 ? 4 : Math.max(8, Math.round(v/max*56));
+        return '<div class="col">'+(v>0?'<span>'+v+'</span>':'')+'<i class="'+(v<0?'none':'')+'" style="height:'+h+'px"></i><span>'+LET[j]+'</span></div>';
+      }).join('')+'</div>';
+      return '<section><div class="goal-top"><span class="goal-name">'+esc(g.name)+'</span><button class="x" data-gdel="'+g.id+'" aria-label="Remove goal">×</button></div>'
+        + '<div class="stats"><div class="stat"><b>'+s+'</b><small>Current streak (days)</small></div><div class="stat"><b>'+bestStreak(g.id)+'</b><small>Best streak (days)</small></div>'
+        + '<div class="stat"><b>'+allKeys.length+'</b><small>Days worked, all time</small></div><div class="stat"><b>'+fmt(tot)+'</b><small>Total time invested</small></div></div>'
+        + (nm ? '<p class="next">'+(nm-s)+' more '+((nm-s)===1?'day':'days')+' to reach a '+nm+'-day streak.</p>' : '')
+        + '<p class="next"><strong>'+(weekOff===0?'This week':'That week')+':</strong> '+(wDays?fmt(wTot)+' across '+wDays+(wDays===1?' day':' days'):'no sessions logged')+' (minutes per day below)</p>'+chart+'</section>';
+    }).join('');
+  }
+
+  function showTab(p){
+    document.getElementById('v-today').hidden = p; document.getElementById('v-prog').hidden = !p;
+    document.getElementById('t-today').setAttribute('aria-selected', !p); document.getElementById('t-prog').setAttribute('aria-selected', p);
+    if(p) renderProg();
+  }
+  document.getElementById('t-today').onclick = function(){ showTab(false); };
+  document.getElementById('t-prog').onclick = function(){ weekOff=0; showTab(true); };
+  document.getElementById('w-prev').onclick = function(){ weekOff--; renderProg(); };
+  document.getElementById('w-next').onclick = function(){ if(weekOff<0){ weekOff++; renderProg(); } };
+  document.getElementById('toast-undo').onclick = function(){ if(undoFn) undoFn(); document.getElementById('toast').hidden=true; undoFn=null; };
+
+  document.getElementById('moods').addEventListener('click', function(e){
+    var b = e.target.closest('.mood'); if(!b) return;
+    var d = day(today); d.mood = (d.mood===b.dataset.m) ? null : b.dataset.m; save(); renderMood();
+  });
+  function addTodo(){
+    var i=document.getElementById('todo-in'), v=i.value.trim(); if(!v) return;
+    day(today).todos.push({id:uid(),t:v,done:false}); i.value=''; save(); renderTodos();
+  }
+  document.getElementById('todo-add').onclick = addTodo;
+  document.getElementById('todo-in').addEventListener('keydown', function(e){ if(e.key==='Enter') addTodo(); });
+  document.getElementById('todos').addEventListener('click', function(e){
+    var d = day(today);
+    if (e.target.dataset.del){ d.todos = d.todos.filter(function(t){return t.id!==e.target.dataset.del;}); save(); renderTodos(); }
+  });
+  document.getElementById('todos').addEventListener('change', function(e){
+    var id=e.target.dataset.id; if(!id) return;
+    day(today).todos.forEach(function(t){ if(t.id===id) t.done=e.target.checked; }); save(); renderTodos();
+  });
+  function addGoal(){
+    var i=document.getElementById('goal-in'), v=i.value.trim(); if(!v) return;
+    state.goals.push({id:uid(),name:v}); i.value=''; save(); renderGoals();
+  }
+  document.getElementById('goal-add').onclick = addGoal;
+  document.getElementById('goal-in').addEventListener('keydown', function(e){ if(e.key==='Enter') addGoal(); });
+  document.getElementById('goals').addEventListener('click', function(e){
+    var t=e.target;
+    if (t.dataset.open){ openId=t.dataset.open; renderGoals(); }
+    else if (t.dataset.min){ logGoal(t.dataset.g, t.dataset.min); }
+    else if (t.dataset.save){ logGoal(t.dataset.save, document.getElementById('min-in').value); }
+    else if (t.dataset.cancel){ openId=null; renderGoals(); }
+  });
+  document.getElementById('goals').addEventListener('keydown', function(e){
+    if (e.key==='Enter' && e.target.id==='min-in') logGoal(openId, e.target.value);
+  });
+  document.getElementById('prog').addEventListener('click', function(e){
+    var del = e.target.closest('[data-gdel]');
+    if (del && confirm('Remove this goal and all of its history?')){
+      state.goals = state.goals.filter(function(g){return g.id!==del.dataset.gdel;});
+      Object.keys(state.days).forEach(function(k){ if(state.days[k].goals) delete state.days[k].goals[del.dataset.gdel]; });
+      save(); renderProg(); renderGoals(); renderMood();
+    }
+  });
+
+  renderMood(); renderTodos(); renderGoals();
+  setSync('Saved on this device.');
+
+  document.getElementById('bk').onclick = function(){
+    var blob = new Blob([JSON.stringify(state)], {type:'application/json'});
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'my-day-backup.json';
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  document.getElementById('rs').onclick = function(){ document.getElementById('rf').click(); };
+  document.getElementById('rf').onchange = function(e){
+    var f = e.target.files[0]; if(!f) return;
+    var r = new FileReader();
+    r.onload = function(){
+      try {
+        var p = JSON.parse(r.result);
+        if(!p || typeof p.days!=='object' || !Array.isArray(p.goals)) throw 1;
+        if(!confirm('Replace everything in the app with this backup?')) return;
+        state = p; save(); renderMood(); renderTodos(); renderGoals(); renderProg();
+      } catch(err){ alert('That file is not a valid backup.'); }
+    };
+    r.readAsText(f); e.target.value = '';
+  };
+})();
+</script>
+</body>
+</html>
